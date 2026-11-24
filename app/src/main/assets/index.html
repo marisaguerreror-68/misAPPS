@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PADI Interinos</title>
+<style>
+:root{color-scheme:light dark;
+  --rojo:#C8102E;--rojo-osc:#9e0c24;
+  --bg:light-dark(#f4f4f2,#121314);--card:light-dark(#fff,#1d1f21);--ink:light-dark(#1b1b1b,#ececec);
+  --sub:light-dark(#5f6368,#a3a7ab);--line:light-dark(#e3e3e0,#2e3134);--chip:light-dark(#eeeeeb,#2a2d30);
+  --nuevo:light-dark(#0b6b3a,#5fd39a);--nuevo-bg:light-dark(#e3f4ea,#173326);--aviso:light-dark(#8a5a00,#f0c060)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Roboto",sans-serif}
+header{background:var(--rojo);color:#fff;padding:14px 16px 16px}
+header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
+header .sub{font-size:13px;opacity:.9;margin-top:2px}
+.fila{display:flex;gap:8px;align-items:center;margin-top:12px}
+select,input[type=time],input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:44px;padding:0 10px}
+header select{flex:1;border:0;font-weight:600}
+button{font:inherit;font-size:15px;font-weight:600;min-height:44px;padding:0 14px;border-radius:10px;border:0;cursor:pointer}
+.btn-blanco{background:#fff;color:var(--rojo)}
+.btn{background:var(--chip);color:var(--ink)}
+.btn-rojo{background:var(--rojo);color:#fff}
+button:disabled{opacity:.6}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
+main{padding:12px 12px 40px;max-width:900px;margin:0 auto}
+.estado{font-size:13px;color:var(--sub);margin:4px 4px 12px}
+.estado b{color:var(--ink)}
+.aviso{background:light-dark(#fff4dc,#3a2f14);color:var(--aviso);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.panel{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+.panel h2{font-size:15px;margin:0 0 10px;font-weight:700}
+.total{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.total .n{font-size:40px;font-weight:800;line-height:1;color:var(--rojo)}
+.total .t{color:var(--sub);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:12px}
+th,td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-size:12px;color:var(--sub);font-weight:600}
+td.cero{color:var(--sub)}
+tr.tot td{font-weight:700;border-bottom:0}
+.scroll{overflow-x:auto}
+.filtros{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.filtros .ancho{grid-column:1/-1}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-size:15px}
+.chk input{width:22px;height:22px;accent-color:var(--rojo)}
+.lista{display:grid;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.card h3{margin:0;font-size:16px;line-height:1.3}
+.card .loc{color:var(--sub);font-size:14px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{background:var(--chip);border-radius:999px;padding:3px 10px;font-size:12.5px;white-space:nowrap}
+.tag.e{background:light-dark(#fde8eb,#3a1a20);color:light-dark(var(--rojo-osc),#ff8b9b)}
+.tag.o{background:light-dark(#e6eef8,#18263a);color:light-dark(#1d4f8f,#8db8ff)}
+.badge{background:var(--nuevo-bg);color:var(--nuevo);font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:10px 0 0;font-size:14px}
+dt{color:var(--sub)}dd{margin:0}
+.obs{margin-top:8px;font-size:14px;background:var(--bg);border-radius:8px;padding:8px 10px;white-space:pre-line}
+.vacio{text-align:center;color:var(--sub);padding:30px 10px}
+details.panel summary{font-weight:700;font-size:15px;cursor:pointer;min-height:28px}
+.esps{display:grid;gap:2px;margin:8px 0 12px}
+.peq{font-size:13px;color:var(--sub)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:g .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes g{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+@media(min-width:700px){.filtros{grid-template-columns:repeat(4,minmax(0,1fr))}.lista{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Puestos de interinidad ofertados</h1>
+  <div class="sub">Cuerpo 0590 · Profesores de Enseñanza Secundaria · todas las DAT</div>
+  <div class="fila">
+    <select id="selFecha" aria-label="Asignación"></select>
+    <button id="btnAct" class="btn-blanco">Actualizar</button>
+  </div>
+</header>
+<main>
+  <div id="estado" class="estado"></div>
+  <div id="aviso"></div>
+
+  <section class="panel" id="resumen"></section>
+
+  <section class="panel">
+    <h2>Filtrar</h2>
+    <div class="filtros">
+      <select id="fConv" aria-label="Convocatoria"><option value="">Ordinaria y extraordinaria</option><option value="O">Ordinaria</option><option value="E">Extraordinaria</option></select>
+      <select id="fEsp" aria-label="Especialidad"></select>
+      <select id="fDat" aria-label="DAT"></select>
+      <select id="fVac" aria-label="Vacante o sustitución"><option value="">Vacantes y sustituciones</option><option value="Vacante">Solo vacantes</option><option value="Sustitución">Solo sustituciones</option></select>
+      <input id="fTxt" class="ancho" type="search" placeholder="Buscar centro, localidad o texto…" aria-label="Buscar">
+      <label class="chk ancho"><input type="checkbox" id="fNuevo"> Solo puestos nuevos respecto a la asignación anterior</label>
+    </div>
+  </section>
+
+  <div class="estado" id="cuenta"></div>
+  <section class="lista" id="lista"></section>
+
+  <details class="panel" id="ajustes" style="margin-top:16px">
+    <summary>Ajustes y datos</summary>
+    <p class="peq">La app consulta PADI de lunes a viernes a la hora indicada. Si la asignación del siguiente día lectivo aún no está publicada, lo reintenta cada 30 minutos hasta las 20:00. Todo se guarda solo en este móvil.</p>
+    <label class="chk">Hora de la consulta <input type="time" id="hora" style="margin-left:auto"></label>
+    <div class="peq" style="margin-top:6px">Especialidades a consultar:</div>
+    <div class="esps" id="listaEsps"></div>
+    <div class="fila" style="flex-wrap:wrap">
+      <button class="btn-rojo" id="btnGuardar">Guardar ajustes</button>
+      <button class="btn" id="btnCsv">Compartir CSV</button>
+      <button class="btn" id="btnBorrar">Borrar esta asignación</button>
+    </div>
+    <p class="peq" id="msgAjustes"></p>
+    <p class="peq">Fuente: <a href="https://gestiona.comunidad.madrid/padi/#!/necesidades">gestiona.comunidad.madrid/padi</a>. Tipo de puesto: 01 Ordinario · 02 Compartir horario · 03 Compartir centro · 04 Jornada parcial · 05 Itinerante · 06 Centros penitenciarios y de menores, UFIL y ACE · 07 Aulas hospitalarias, SAED y CET.</p>
+  </details>
+</main>
+
+<script>
+{
+const A = window.Android;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DATS = ['CAPITAL','NORTE','SUR','ESTE','OESTE'];
+const CONV = {O:'Ordinaria', E:'Extraordinaria'};
+const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+let actual = null, catalogo = [], estado = {};
+
+const fLarga = iso => { const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y, m-1, d); return `${DIAS[dt.getDay()]} ${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; };
+const fCorta = iso => iso ? iso.split('-').reverse().join('/').replace(/^(\d\d\/\d\d\/)\d\d(\d\d)$/, '$1$2') : '';
+const hora = s => s ? s.slice(11,16) : '';
+
+function cargarFechas(sel){
+  const fs = JSON.parse(A.fechas());
+  $('selFecha').innerHTML = fs.length ? fs.map(f => `<option value="${esc(f)}">Asignación del ${esc(fLarga(f))}</option>`).join('') : '<option value="">Sin consultas guardadas</option>';
+  if (sel && fs.includes(sel)) $('selFecha').value = sel;
+  mostrar($('selFecha').value);
+}
+
+function mostrar(f){
+  actual = f ? JSON.parse(A.consulta(f)) : null;
+  const ps = actual ? actual.puestos : [];
+  const esps = [...new Set(ps.map(p => p.esp))].sort();
+  $('fEsp').innerHTML = '<option value="">Todas las especialidades</option>' + esps.map(e => `<option value="${esc(e)}">${esc(e)} · ${esc(nombre(e))}</option>`).join('');
+  const dats = DATS.filter(d => ps.some(p => p.dat === d));
+  $('fDat').innerHTML = '<option value="">Todas las DAT</option>' + dats.map(d => `<option>${esc(d)}</option>`).join('');
+  pintarResumen(); pintarLista(); pintarEstado();
+}
+
+const nombre = cod => (catalogo.find(c => c.cod === cod) || {}).nombre || cod;
+
+function pintarResumen(){
+  if (!actual){ $('resumen').innerHTML = '<div class="vacio">Aún no hay datos. Pulsa <b>Actualizar</b> para hacer la primera consulta.</div>'; return; }
+  const ps = actual.puestos, conv = actual.convocatorias || {};
+  const activas = (estado.esps || []);
+  const filas = catalogo.filter(c => activas.includes(c.cod) || ps.some(p => p.esp === c.cod)).map(c => {
+    const de = ps.filter(p => p.esp === c.cod);
+    const n = (k, v) => de.filter(p => p[k] === v).length;
+    const celdas = [n('convocatoria','O'), n('convocatoria','E'), ...DATS.map(d => n('dat', d)), de.length];
+    return `<tr><td>${esc(c.cod)} ${esc(c.nombre)}</td>${celdas.map(x => `<td class="${x ? '' : 'cero'}">${x}</td>`).join('')}</tr>`;
+  });
+  const tot = [ps.filter(p=>p.convocatoria==='O').length, ps.filter(p=>p.convocatoria==='E').length, ...DATS.map(d => ps.filter(p=>p.dat===d).length), ps.length];
+  const nuevos = ps.filter(p => p.nuevo).length;
+  const noPub = Object.entries(conv).filter(([k,v]) => !v.publicada).map(([k]) => CONV[k]);
+  $('resumen').innerHTML = `
+    <div class="total"><span class="n">${ps.length}</span><span class="t">puestos ofertados · ${esc(fLarga(actual.fecha))}${nuevos && ps.length !== nuevos ? ` · <b style="color:var(--nuevo)">${nuevos} nuevos</b>` : ''}</span></div>
+    ${noPub.length ? `<div class="peq" style="margin-top:6px">Sin convocatoria ${esc(noPub.join(' ni ').toLowerCase())} publicada para ese día.</div>` : ''}
+    <div class="scroll"><table><thead><tr><th>Especialidad</th><th>Ord.</th><th>Extra.</th>${DATS.map(d => `<th>${esc(d[0] + d.slice(1).toLowerCase())}</th>`).join('')}<th>Total</th></tr></thead>
+    <tbody>${filas.join('')}<tr class="tot"><td>Total</td>${tot.map(x => `<td>${x}</td>`).join('')}</tr></tbody></table></div>`;
+}
+
+function filtrados(){
+  if (!actual) return [];
+  const c = $('fConv').value, e = $('fEsp').value, d = $('fDat').value, v = $('fVac').value, n = $('fNuevo').checked;
+  const t = $('fTxt').value.trim().toLowerCase();
+  return actual.puestos.filter(p => (!c || p.convocatoria === c) && (!e || p.esp === e) && (!d || p.dat === d) && (!v || p.vacSust === v) && (!n || p.nuevo)
+    && (!t || [p.centro, p.localidad, p.distrito, p.causa, p.observaciones, p.codCentro, p.id].join(' ').toLowerCase().includes(t)));
+}
+
+function pintarLista(){
+  const ps = filtrados();
+  $('cuenta').textContent = actual ? `${ps.length} de ${actual.puestos.length} puestos` : '';
+  if (!actual){ $('lista').innerHTML = ''; return; }
+  if (!ps.length){ $('lista').innerHTML = '<div class="vacio">Ningún puesto con estos filtros.</div>'; return; }
+  $('lista').innerHTML = ps.map(p => `
+    <article class="card">
+      <div class="top"><div><h3>${esc(p.centro)}</h3><div class="loc">${esc(p.localidad)}${p.distrito ? ' · ' + esc(p.distrito) : ''} · DAT ${esc(p.dat)}</div></div>
+      ${p.nuevo ? '<span class="badge">Nuevo</span>' : ''}</div>
+      <div class="tags"><span class="tag ${p.convocatoria === 'E' ? 'e' : 'o'}">${esc(CONV[p.convocatoria])}</span><span class="tag">${esc(p.esp)} ${esc(p.espNombre)}</span><span class="tag">${esc(p.vacSust)}</span><span class="tag">Tipo ${esc(p.tipo)} · ${esc(p.tipoPuesto)}</span></div>
+      <dl><dt>Causa</dt><dd>${esc(p.causa)}</dd><dt>Fin estimado</dt><dd>${esc(fCorta(p.fechaFin))}</dd><dt>Jornada</dt><dd>${esc(p.parcialidad)}</dd><dt>ID / Centro</dt><dd>${esc(p.id)} · ${esc(p.codCentro)}</dd>
+      ${p.centrosCompartidos ? `<dt>Compartido</dt><dd>${esc(p.centrosCompartidos)}</dd>` : ''}</dl>
+      ${p.observaciones ? `<div class="obs">${esc(p.observaciones.trim())}</div>` : ''}
+    </article>`).join('');
+}
+
+function pintarEstado(){
+  estado = JSON.parse(A.estado());
+  const prox = estado.proxima ? new Date(estado.proxima) : null;
+  const pf = prox ? `${DIAS[prox.getDay()]} ${prox.toLocaleDateString('es-ES')} a las ${prox.toTimeString().slice(0,5)}` : '—';
+  $('estado').innerHTML = (actual ? `Consultado el ${esc(fCorta(actual.consultadoEn.slice(0,10)))} a las <b>${esc(hora(actual.consultadoEn))}</b> · ` : '') + `Próxima consulta: <b>${esc(pf)}</b>`
+    + (estado.ultimoEstado ? `<br>Último intento (${esc(fCorta(estado.ultimoIntento.slice(0,10)))} ${esc(hora(estado.ultimoIntento))}): ${esc(estado.ultimoEstado)}` : '');
+  $('aviso').innerHTML = estado.exacta === false ? '<div class="aviso">El móvil no permite alarmas exactas: la consulta puede retrasarse unos minutos. <button class="btn" id="btnExacta" style="margin-top:6px">Permitir alarmas exactas</button></div>' : '';
+  const be = $('btnExacta'); if (be) be.onclick = () => A.permitirAlarmasExactas();
+}
+
+function pintarAjustes(){
+  $('hora').value = `${String(estado.hora ?? 15).padStart(2,'0')}:${String(estado.minuto ?? 0).padStart(2,'0')}`;
+  $('listaEsps').innerHTML = catalogo.map(c => `<label class="chk"><input type="checkbox" value="${esc(c.cod)}" ${(estado.esps || []).includes(c.cod) ? 'checked' : ''}> ${esc(c.cod)} · ${esc(c.nombre)}</label>`).join('');
+}
+
+function csv(){
+  const cols = [['Convocatoria',p=>CONV[p.convocatoria]],['Cód. esp.',p=>p.esp],['Especialidad',p=>p.espNombre],['ID',p=>p.id],['Cód. centro',p=>p.codCentro],['Centro',p=>p.centro],['Localidad',p=>p.localidad],['Distrito',p=>p.distrito],['DAT',p=>p.dat],['Tipo',p=>p.tipo],['Tipo de puesto',p=>p.tipoPuesto],['Jornada',p=>p.parcialidad],['Vacante/Sustitución',p=>p.vacSust],['Causa',p=>p.causa],['Fecha fin estimada',p=>fCorta(p.fechaFin)],['Nuevo',p=>p.nuevo?'Sí':''],['Información adicional',p=>(p.observaciones||'').replace(/\s*\n\s*/g,' · ')]];
+  const q = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  return [cols.map(c => q(c[0])).join(';'), ...filtrados().map(p => cols.map(c => q(c[1](p))).join(';'))].join('\n');
+}
+
+$('selFecha').onchange = e => mostrar(e.target.value);
+['fConv','fEsp','fDat','fVac','fNuevo'].forEach(id => $(id).onchange = pintarLista);
+$('fTxt').oninput = pintarLista;
+$('btnAct').onclick = () => { $('btnAct').disabled = true; $('btnAct').innerHTML = '<span class="spin"></span>Consultando'; A.actualizar(); };
+window.alActualizar = txt => {
+  const r = JSON.parse(txt);
+  $('btnAct').disabled = false; $('btnAct').textContent = 'Actualizar';
+  cargarFechas(r.fecha || $('selFecha').value);
+  if (!r.ok || r.sinFechaNueva) $('aviso').innerHTML = `<div class="aviso">${esc(r.mensaje)}</div>`;
+};
+window.alVolver = () => cargarFechas($('selFecha').value);
+$('btnGuardar').onclick = () => {
+  const [h, m] = ($('hora').value || '15:00').split(':').map(Number);
+  const esps = [...$('listaEsps').querySelectorAll('input:checked')].map(i => i.value);
+  A.guardarAjustes(JSON.stringify({hora:h, minuto:m, esps}));
+  pintarEstado(); pintarResumen();
+  $('msgAjustes').textContent = 'Ajustes guardados.';
+};
+$('btnCsv').onclick = () => actual && A.compartir(csv(), `PADI 0590 · asignación ${fCorta(actual.fecha)}`);
+let confirmar = false;
+$('btnBorrar').onclick = () => {
+  if (!actual) return;
+  if (!confirmar){ confirmar = true; $('btnBorrar').textContent = 'Pulsa otra vez para borrar'; setTimeout(() => { confirmar = false; $('btnBorrar').textContent = 'Borrar esta asignación'; }, 4000); return; }
+  confirmar = false; $('btnBorrar').textContent = 'Borrar esta asignación';
+  A.borrar(actual.fecha); cargarFechas();
+};
+
+catalogo = JSON.parse(A.catalogo());
+estado = JSON.parse(A.estado());
+pintarAjustes();
+cargarFechas();
+}
+</script>
+</body>
+</html>
